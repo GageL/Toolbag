@@ -11,7 +11,7 @@
 ```json
 {
     "dependencies": {
-        "com.lucasindustries.lucasindustriestools": "https://github.com/GageL/Toolbag.git"
+        "com.lucasindustries.toolbag": "https://github.com/GageL/Toolbag.git"
     }
 }
 ```
