@@ -28,7 +28,7 @@ namespace LucasIndustries.Editor {
 		#endregion
 
 		#region Static Methods
-		[MenuItem("LucasIndustries/Editor Commands/Clear Console _F3")]
+		[MenuItem("Lucas Industries/Editor Commands/Clear Console _F3")]
 		static void ClearConsole() {
 			Debug.ClearDeveloperConsole();
 			var assembly = Assembly.GetAssembly(typeof(ActiveEditorTracker));

@@ -1,7 +1,9 @@
 {
     "name": "LucasIndustriesTools.Editor",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "LucasIndustriesTools.Runtime"
+    ],
     "includePlatforms": [
         "Editor"
     ],

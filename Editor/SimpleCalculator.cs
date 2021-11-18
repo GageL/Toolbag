@@ -41,7 +41,7 @@ namespace LucasIndustries.Editor {
 			EditorGUILayout.EndVertical();
 		}
 
-		[MenuItem("LucasIndustries/SimpleCalculator")]
+		[MenuItem("Lucas Industries/SimpleCalculator")]
 		private static void ShowWindow() {
 			GetWindow(typeof(SimpleCalculator), false, "Simple Calculator").Show();
 		}

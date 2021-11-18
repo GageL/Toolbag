@@ -64,7 +64,7 @@ namespace LucasIndustries.Editor {
 			EditorGUILayout.EndVertical();
 		}
 
-		[MenuItem("LucasIndustries/PlayerPrefsManager")]
+		[MenuItem("Lucas Industries/PlayerPrefsManager")]
 		private static void ShowWindow() {
 			GetWindow(typeof(PlayerPrefsManager), false, "Player Prefs Manager").Show();
 		}

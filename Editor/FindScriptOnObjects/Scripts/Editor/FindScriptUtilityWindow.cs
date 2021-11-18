@@ -128,7 +128,7 @@ namespace LucasIndustries.Editor {
 		#endregion
 
 		#region Static Functions
-		[MenuItem("LucasIndustries/Find Script")]
+		[MenuItem("Lucas Industries/Find Script")]
 		public static void InitializeWindow() {
 			window = GetWindow<FindScriptUtilityWindow>(false);
 			window.titleContent = new GUIContent("Find Script");
