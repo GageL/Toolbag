@@ -38,14 +38,12 @@ namespace LucasIndustries.Runtime {
 
 		private void OnEnable() {
 			Application.logMessageReceived += LogMessageReceived;
-			Application.logMessageReceivedThreaded += LogMessageReceived;
 			submitLogButton.onClick.AddListener(() => SubmitLogButtonClick());
 			clearLogButton.onClick.AddListener(() => ClearLogButtonClick());
 		}
 
 		private void OnDisable() {
 			Application.logMessageReceived -= LogMessageReceived;
-			Application.logMessageReceivedThreaded += LogMessageReceived;
 			submitLogButton.onClick.RemoveListener(() => SubmitLogButtonClick());
 			clearLogButton.onClick.RemoveListener(() => ClearLogButtonClick());
 		}
