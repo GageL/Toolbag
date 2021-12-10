@@ -12,6 +12,7 @@ using UnityEngine.EventSystems;
 namespace LucasIndustries.Runtime {
 	public class LoggerCanvas : MonoBehaviour {
 		#region Public/Private Variables
+		public static LoggerCanvas Instance;
 		public static Action<string> OnCommandSubmit;
 		[SerializeField] private GameObject loggerMenu;
 		[SerializeField] private TMP_Text logText;
@@ -26,6 +27,7 @@ namespace LucasIndustries.Runtime {
 
 		#region Native Methods
 		private void Awake() {
+			Instance = this;
 			DontDestroyOnLoad(this.gameObject);
 			loggerMenu.SetActive(false);
 			sb = new StringBuilder();
