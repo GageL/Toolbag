@@ -86,6 +86,14 @@ namespace LucasIndustries.Runtime {
 		public void ToggleMenu() {
 			loggerMenu.SetActive(!loggerMenu.activeSelf);
 		}
+
+		public void OpenMenu() {
+			loggerMenu.SetActive(true);
+		}
+
+		public void CloseMenu() {
+			loggerMenu.SetActive(false);
+		}
 		#endregion
 
 		#region Private Methods
