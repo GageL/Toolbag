@@ -1,6 +1,6 @@
 {
     "name": "com.lucasindustries.toolbag",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "displayName": "Toolbag",
     "description": "A toolbox with a myriad of features to quicken and streamline development.",
     "unity": "2019.1",

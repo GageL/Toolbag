@@ -1,5 +1,6 @@
 using System.Text;
 using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
@@ -11,6 +12,7 @@ using UnityEngine.EventSystems;
 namespace LucasIndustries.Runtime {
 	public class LoggerCanvas : MonoBehaviour {
 		#region Public/Private Variables
+		public static Action<string> OnCommandSubmit;
 		[SerializeField] private GameObject loggerMenu;
 		[SerializeField] private TMP_Text logText;
 		[SerializeField] private TMP_InputField commandInputField;
@@ -61,9 +63,10 @@ namespace LucasIndustries.Runtime {
 		}
 
 		private void SubmitLogButtonClick() {
-			if (string.IsNullOrEmpty(commandInputField.text)) { commandInputField.text = string.Empty; return; }
+			if (string.IsNullOrEmpty(commandInputField.text)) { return; }
 			sb.Append($"[{System.DateTime.Now.ToString("G")}] => {commandInputField.text}\n");
 			logText.text = sb.ToString();
+			OnCommandSubmit?.Invoke(commandInputField.text);
 			commandInputField.text = string.Empty;
 		}
 
