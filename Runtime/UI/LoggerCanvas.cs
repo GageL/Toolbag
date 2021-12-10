@@ -48,7 +48,7 @@ namespace LucasIndustries.Runtime {
 
 		private void Update() {
 			if (Input.GetKeyDown(KeyCode.BackQuote)) {
-				loggerMenu.SetActive(!loggerMenu.activeSelf);
+				ToggleMenu();
 			}
 		}
 		#endregion
@@ -81,7 +81,9 @@ namespace LucasIndustries.Runtime {
 		#endregion
 
 		#region Public Methods
-
+		public void ToggleMenu() {
+			loggerMenu.SetActive(!loggerMenu.activeSelf);
+		}
 		#endregion
 
 		#region Private Methods
