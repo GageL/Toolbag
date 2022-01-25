@@ -66,13 +66,17 @@ namespace LucasIndustries.Runtime {
 
 		public void Show(Action OnStart = null, Action OnComplete = null) {
 			if (canvasGroup == null) { return; }
+			OnShow();
 			canvasGroup.DOFade(1, fadeInSpeed).SetEase(fadeInEase).OnStart(() => { OnStart?.Invoke(); OnShowStarted?.Invoke(); }).OnComplete(() => { SetValues(true); isControlShown = true; OnComplete?.Invoke(); OnShowCompleted?.Invoke(); });
 		}
+		protected virtual void OnShow() { }
 
 		public void Hide(Action OnStart = null, Action OnComplete = null) {
 			if (canvasGroup == null) { return; }
+			OnHide();
 			canvasGroup.DOFade(0, fadeOutSpeed).SetEase(fadeOutEase).OnStart(() => { SetValues(false); OnStart?.Invoke(); OnHideStarted?.Invoke(); }).OnComplete(() => { isControlShown = false; OnComplete?.Invoke(); OnHideCompleted?.Invoke(); });
 		}
+		protected virtual void OnHide() { }
 		#endregion
 
 		#region Private Methods
