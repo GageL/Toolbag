@@ -77,6 +77,10 @@ namespace LucasIndustries.Runtime {
 			canvasGroup.DOFade(0, fadeOutSpeed).SetEase(fadeOutEase).OnStart(() => { SetValues(false); OnStart?.Invoke(); OnHideStarted?.Invoke(); }).OnComplete(() => { isControlShown = false; OnComplete?.Invoke(); OnHideCompleted?.Invoke(); });
 		}
 		protected virtual void OnHide() { }
+
+		public bool IsShown() {
+			return isControlShown;
+		}
 		#endregion
 
 		#region Private Methods
