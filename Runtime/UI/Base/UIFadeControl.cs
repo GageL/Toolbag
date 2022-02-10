@@ -19,11 +19,13 @@ namespace LucasIndustries.Runtime {
 		[SerializeField] private CanvasGroup canvasGroup;
 		[FoldoutGroup("UIFadeControl")]
 		[SerializeField] private bool startShown = false;
+		public float FadeInSpeed { get { return fadeInSpeed; } }
 		[FoldoutGroup("UIFadeControl")]
 		[SerializeField] private float fadeInSpeed = 0.5f;
 		[FoldoutGroup("UIFadeControl")]
 		[SerializeField] private Ease fadeInEase = Ease.InOutQuad;
 		[FoldoutGroup("UIFadeControl")]
+		public float FadeOutSpeed { get { return fadeOutSpeed; } }
 		[SerializeField] private float fadeOutSpeed = 0.5f;
 		[FoldoutGroup("UIFadeControl")]
 		[SerializeField] private Ease fadeOutEase = Ease.InOutQuad;
