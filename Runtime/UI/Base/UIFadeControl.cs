@@ -39,7 +39,7 @@ namespace LucasIndustries.Runtime {
 		#region Native Methods
 		private void OnValidate() {
 			TryGetRef();
-			InstantControl(startShown);
+			//InstantControl(startShown);
 		}
 
 		private void Start() {
