@@ -8,7 +8,8 @@ using System;
 
 namespace LucasIndustries.Runtime {
 	[RequireComponent(typeof(CanvasGroup))]
-	[ScriptExecutionOrder(-1)]
+	[DefaultExecutionOrder(-1)]
+	//[ScriptExecutionOrder(-1)]
 	public class UIFadeControl : MonoBehaviour {
 		#region Public/Private Variables
 		public Action OnShowStarted;

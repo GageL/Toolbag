@@ -5,7 +5,8 @@ using DG.Tweening;
 
 namespace LucasIndustries.Runtime {
 	[RequireComponent(typeof(AudioSource))]
-	[ScriptExecutionOrder(-1)]
+	[DefaultExecutionOrder(-1)]
+	//[ScriptExecutionOrder(-1)]
 	public class AudioSourceInterpolater : MonoBehaviour {
 		#region Static/Const Variables
 

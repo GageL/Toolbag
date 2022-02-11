@@ -46,8 +46,9 @@ namespace LucasIndustries.Runtime {
 				if (monoScript.GetClass() != null) {
 					foreach (var attr in Attribute.GetCustomAttributes(monoScript.GetClass(), typeof(ScriptExecutionOrder))) {
 						var newOrder = ((ScriptExecutionOrder)attr).order;
-						if (MonoImporter.GetExecutionOrder(monoScript) != newOrder)
+						if (MonoImporter.GetExecutionOrder(monoScript) != newOrder) {
 							MonoImporter.SetExecutionOrder(monoScript, newOrder);
+						}
 					}
 				}
 			}
