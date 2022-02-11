@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Text.RegularExpressions;
+using System.Net.Mail;
 
 namespace LucasIndustries.Runtime {
 	public static class StaticUtilities {
@@ -21,13 +22,19 @@ namespace LucasIndustries.Runtime {
 		}
 
 		public static bool IsStructuredEmail(this string input) {
-			Regex regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
-			Match match = regex.Match(input);
-			if (match.Success) {
+			try {
+				var test = new System.Net.Mail.MailAddress(input);
 				return true;
-			} else {
+			} catch (FormatException ex) {
 				return false;
 			}
+			//Regex regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+			//Match match = regex.Match(input);
+			//if (match.Success) {
+			//	return true;
+			//} else {
+			//	return false;
+			//}
 		}
 
 		public static bool HasUpperAndLowerChar(this string input) {
