@@ -22,12 +22,13 @@ namespace LucasIndustries.Runtime {
 		}
 
 		public static bool IsStructuredEmail(this string input) {
-			try {
-				var test = new System.Net.Mail.MailAddress(input);
-				return true;
-			} catch (FormatException ex) {
-				return false;
-			}
+			//try {
+			//	var test = new System.Net.Mail.MailAddress(input);
+			//	return true;
+			//} catch (FormatException ex) {
+			//	return false;
+			//}
+
 			//Regex regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
 			//Match match = regex.Match(input);
 			//if (match.Success) {
@@ -35,6 +36,14 @@ namespace LucasIndustries.Runtime {
 			//} else {
 			//	return false;
 			//}
+
+			string _regexPattern = @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z";
+			bool isValidEmail = Regex.IsMatch(input, _regexPattern);
+			if (!isValidEmail) {
+				return false;
+			} else {
+				return true;
+			}
 		}
 
 		public static bool HasUpperAndLowerChar(this string input) {
