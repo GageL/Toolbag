@@ -7,6 +7,7 @@ using Sirenix.OdinInspector;
 using System;
 
 namespace LucasIndustries.Runtime {
+	[DefaultExecutionOrder(-2)]
 	[RequireComponent(typeof(CanvasGroup))]
 	public class UIFadeControl : MonoBehaviour {
 		#region Public/Private Variables
