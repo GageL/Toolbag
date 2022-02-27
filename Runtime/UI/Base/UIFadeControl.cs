@@ -47,7 +47,7 @@ namespace LucasIndustries.Runtime {
 			//InstantControl(startShown);
 		}
 
-		private void Awake() {
+		protected void Awake() {
 			if (canvasGroup == null) { return; }
 			InstantControl(startShown);
 		}
