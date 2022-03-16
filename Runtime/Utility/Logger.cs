@@ -6,7 +6,10 @@ using UnityEngine;
 
 namespace LucasIndustries.Runtime {
 	public static class Logger {
+#if ENABLE_LI_LOGGER
 		#region Public/Private Variables
+		public enum LogType { Log, Warning, Error };
+
 		public delegate void OnLogPrintEvent(object message, LogType logType, StackTrace stack);
 		public static event OnLogPrintEvent OnLogPrint;
 		#endregion
@@ -55,9 +58,10 @@ namespace LucasIndustries.Runtime {
 		#region Private Methods
 
 		#endregion
+#endif
 	}
 
 	#region Enums
-	public enum LogType { Log, Warning, Error };
+
 	#endregion
 }

@@ -11,6 +11,7 @@ using UnityEngine.EventSystems;
 
 namespace LucasIndustries.Runtime {
 	public class LoggerCanvas : MonoBehaviour {
+#if ENABLE_LI_LOGGER
 		#region Public/Private Variables
 		public static LoggerCanvas Instance;
 		public static Action<string> OnCommandSubmit;
@@ -103,5 +104,6 @@ namespace LucasIndustries.Runtime {
 		#region Private Methods
 
 		#endregion
+#endif
 	}
 }
