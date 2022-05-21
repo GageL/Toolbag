@@ -44,7 +44,6 @@ namespace LucasIndustries.Runtime {
 		#region Native Methods
 		private void OnValidate() {
 			TryGetRef();
-			//InstantControl(startShown);
 		}
 
 		protected void Awake() {
@@ -71,17 +70,17 @@ namespace LucasIndustries.Runtime {
 
 		public void Show(Action OnStart = null, Action OnComplete = null) {
 			if (canvasGroup == null) { return; }
-			OnShow();
-			canvasGroup.DOFade(1, fadeInSpeed).SetEase(fadeInEase).OnStart(() => { OnStart?.Invoke(); OnShowStarted?.Invoke(); }).OnComplete(() => { SetValues(true); isControlShown = true; OnComplete?.Invoke(); OnShowCompleted?.Invoke(); });
+			canvasGroup.DOFade(1, fadeInSpeed).SetEase(fadeInEase).OnStart(() => { OnShowStart(); OnStart?.Invoke(); OnShowStarted?.Invoke(); }).OnComplete(() => { OnShowComplete(); SetValues(true); isControlShown = true; OnComplete?.Invoke(); OnShowCompleted?.Invoke(); });
 		}
-		protected virtual void OnShow() { }
+		protected virtual void OnShowStart() { }
+		protected virtual void OnShowComplete() { }
 
 		public void Hide(Action OnStart = null, Action OnComplete = null) {
 			if (canvasGroup == null) { return; }
-			OnHide();
-			canvasGroup.DOFade(0, fadeOutSpeed).SetEase(fadeOutEase).OnStart(() => { SetValues(false); OnStart?.Invoke(); OnHideStarted?.Invoke(); }).OnComplete(() => { isControlShown = false; OnComplete?.Invoke(); OnHideCompleted?.Invoke(); });
+			canvasGroup.DOFade(0, fadeOutSpeed).SetEase(fadeOutEase).OnStart(() => { OnHideStart(); SetValues(false); OnStart?.Invoke(); OnHideStarted?.Invoke(); }).OnComplete(() => { OnHideComplete(); isControlShown = false; OnComplete?.Invoke(); OnHideCompleted?.Invoke(); });
 		}
-		protected virtual void OnHide() { }
+		protected virtual void OnHideStart() { }
+		protected virtual void OnHideComplete() { }
 
 		public bool IsShown() {
 			return isControlShown;
