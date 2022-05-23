@@ -6,7 +6,16 @@ using UnityEngine;
 using UnityEditor;
 
 namespace LucasIndustries.Editor {
-	public class PlayerPrefsManagerEditor : EditorWindow {
+	[Serializable]
+	public class PlayerPrefPair {
+		public string Key { get; set; }
+		public object Value { get; set; }
+		public bool IsEditing { get; set; }
+		public Type ValueType { get; set; }
+	}
+
+	public class EditorPlayerPrefsManager : EditorWindow {
+		#region Public/Private Variables
 		private static Vector2 tableScroll;
 		private static PlayerPrefPair[] cachedPrefs = new PlayerPrefPair[0];
 		private static int fieldWidth = 200;
@@ -18,7 +27,13 @@ namespace LucasIndustries.Editor {
 		private static int newPrefIntValue;
 		private static float newPrefFloatValue;
 		private static string newPrefStringValue;
+		#endregion
 
+		#region Runtime Variables
+
+		#endregion
+
+		#region Native Methods
 		private void OnEnable() {
 			cachedPrefs = GetPrefs();
 		}
@@ -30,13 +45,19 @@ namespace LucasIndustries.Editor {
 				GUILayout.Space(6);
 				DrawNewPrefFields();
 				GUILayout.Space(12);
-				HorizontalLine();
+				HorizontalLine(new Color(.5f, .5f, .5f, .5f));
 				GUILayout.Space(12);
 				DrawTable();
 			}
 			EditorGUILayout.EndVertical();
 		}
+		#endregion
 
+		#region Callback Methods
+
+		#endregion
+
+		#region Static Methods
 		private static void DrawToolbar() {
 			EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
 			{
@@ -200,34 +221,40 @@ namespace LucasIndustries.Editor {
 			return _style;
 		}
 
-		[MenuItem("Lucas Industries/Player Prefs Editor")]
+		[MenuItem("Lucas Industries/Player Prefs Manager")]
 		private static void ShowWindow() {
-			PlayerPrefsManagerEditor _window = (PlayerPrefsManagerEditor)GetWindow(typeof(PlayerPrefsManagerEditor), true, "Player Prefs Manager");
-			_window.minSize = new Vector2(WindowWidth(), 300);
-			_window.maxSize = new Vector2(WindowWidth(), 300);
+			EditorPlayerPrefsManager _window = (EditorPlayerPrefsManager)GetWindow(typeof(EditorPlayerPrefsManager), true, "Player Prefs Manager");
+			_window.minSize = new Vector2(WindowWidth(), 268);
+			_window.maxSize = new Vector2(WindowWidth(), 268);
 			_window.Show();
 		}
 
-		private static void HorizontalLine() {
+		private static void HorizontalLine(Color color = default(Color)) {
+			if (color == default(Color)) {
+				color = Color.gray;
+			}
 			GUIStyle _style = new GUIStyle();
 			_style.stretchWidth = true;
 			_style.normal.background = EditorGUIUtility.whiteTexture;
 			_style.margin = new RectOffset(0, 0, 0, 0);
 			_style.fixedHeight = 2;
 			var c = GUI.color;
-			GUI.color = Color.grey;
+			GUI.color = color;
 			GUILayout.Box(GUIContent.none, _style);
 			GUI.color = c;
 		}
 
-		private static void VerticalLine() {
+		private static void VerticalLine(Color color = default(Color)) {
+			if (color == default(Color)) {
+				color = Color.gray;
+			}
 			GUIStyle _style = new GUIStyle();
 			_style.stretchHeight = true;
 			_style.normal.background = EditorGUIUtility.whiteTexture;
 			_style.margin = new RectOffset(0, 0, 0, 0);
 			_style.fixedWidth = 2;
 			var c = GUI.color;
-			GUI.color = Color.grey;
+			GUI.color = color;
 			GUILayout.Box(GUIContent.none, _style);
 			GUI.color = c;
 		}
@@ -264,7 +291,7 @@ namespace LucasIndustries.Editor {
 					return new PlayerPrefPair[0];
 				}
 			} else {
-				throw new NotSupportedException("PlayerPrefsEditor doesn't support this Unity Editor platform");
+				throw new NotSupportedException("EditorPlayerPrefsManager doesn't support this Unity Editor platform");
 			}
 		}
 
@@ -306,13 +333,14 @@ namespace LucasIndustries.Editor {
 				Selection.activeObject = null;
 			}
 		}
-	}
+		#endregion
 
-	[Serializable]
-	public class PlayerPrefPair {
-		public string Key { get; set; }
-		public object Value { get; set; }
-		public bool IsEditing { get; set; }
-		public Type ValueType { get; set; }
+		#region Public Methods
+
+		#endregion
+
+		#region Private Methods
+
+		#endregion
 	}
 }
