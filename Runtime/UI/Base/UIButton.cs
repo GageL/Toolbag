@@ -12,10 +12,11 @@ using UnityEngine.Events;
 namespace LucasIndustries.Runtime {
 	public class UIButton : UIBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler {
 		#region Public/Private Variables
-		public SelectionStateType CurrentSelectionState { get => currentSelectionState; }
+		public StateType CurrentState { get => currentState; }
 		public bool IsSelectable { get => isSelectable; }
 
 		[SerializeField] private bool startDisabled = false;
+		[SerializeField] private bool startSelected = false;
 		[SerializeField] private bool isSelectable = false;
 		[SerializeField] private bool isAnimation = false;
 
@@ -28,11 +29,13 @@ namespace LucasIndustries.Runtime {
 			Image,
 			Text
 		}
-		public enum SelectionStateType {
+		public enum StateType {
 			Idle,
 			Highlighted,
 			Pressed,
 			Selected,
+			SelectedHighlighted,
+			SelectedPressed,
 			Disabled
 		}
 
@@ -41,10 +44,31 @@ namespace LucasIndustries.Runtime {
 			public Graphic TargetGraphic { get => targetGraphic; }
 			public TargetGraphicType GraphicType { get => graphicType; }
 			public TransitionType Transition { get => transition; }
-			public ColorBlock ColorTransitions { get => colorTransitions; }
-			public SpriteState SpriteTransitions { get => spriteTransitions; }
-			[HideInInspector] public Sprite CachedNormalSprite;
-			
+			[Serializable]
+			public class CustomColorBlock {
+				public Color NormalColor;
+				public Color HighlightedColor;
+				public Color PressedColor;
+				public Color SelectedColor;
+				public Color SelectedHighlightedColor;
+				public Color SelectedPressedColor;
+				public Color DisabledColor;
+				public float ColorMultiplier;
+				public float FadeDuration;
+			}
+			public CustomColorBlock ColorTransitions { get => colorTransitions; }
+			[Serializable]
+			public class CustomSpriteState {
+				public Sprite NormalSprite;
+				public Sprite HighlightedSprite;
+				public Sprite PressedSprite;
+				public Sprite SelectedSprite;
+				public Sprite SelectedHighlightedSprite;
+				public Sprite SelectedPressedSprite;
+				public Sprite DisabledSprite;
+			}
+			public CustomSpriteState SpriteTransitions { get => spriteTransitions; }
+
 			[Required]
 			[HideIf("@transition == TransitionType.None")]
 			[SerializeField] private Graphic targetGraphic;
@@ -53,17 +77,20 @@ namespace LucasIndustries.Runtime {
 			[SerializeField] private TargetGraphicType graphicType = TargetGraphicType.Image;
 			[SerializeField] private TransitionType transition = TransitionType.None;
 			[ShowIf("@transition == TransitionType.Color")]
-			[SerializeField] private ColorBlock colorTransitions = new ColorBlock() {
-				normalColor = new Color(1f,1f,1f),
-				highlightedColor = new Color(.8f, .8f, .8f),
-				pressedColor = new Color(.65f, .65f, .65f),
-				selectedColor = new Color(1f,1f,1f),
-				disabledColor = new Color(1f,1f,1f, 0.3f),
-				colorMultiplier = 1f,
-				fadeDuration = .1f
+			[SerializeField]
+			private CustomColorBlock colorTransitions = new CustomColorBlock() {
+				NormalColor = new Color(1f, 1f, 1f),
+				HighlightedColor = new Color(.8f, .8f, .8f),
+				PressedColor = new Color(.65f, .65f, .65f),
+				SelectedColor = new Color(1f, 1f, 1f),
+				SelectedHighlightedColor = new Color(1f, 1f, 1f),
+				SelectedPressedColor = new Color(1f, 1f, 1f),
+				DisabledColor = new Color(1f, 1f, 1f, 0.3f),
+				ColorMultiplier = 1f,
+				FadeDuration = .1f
 			};
 			[ShowIf("@transition == TransitionType.Sprite && graphicType == TargetGraphicType.Image")]
-			[SerializeField] private SpriteState spriteTransitions;
+			[SerializeField] private CustomSpriteState spriteTransitions;
 		}
 		[ShowIf("@isAnimation == false")]
 		[SerializeField] private Element[] elements;
@@ -91,7 +118,8 @@ namespace LucasIndustries.Runtime {
 		public static UIButton CurrentHoveredButton;
 		[GUIColor(1, .4f, .4f)]
 		[Title("Runtime Debug", "These values are set at runtime during play mode")]
-		[SerializeField] private SelectionStateType currentSelectionState;
+		[SerializeField] private StateType currentState;
+		[SerializeField] private bool isSelected;
 		#endregion
 
 		#region Native Methods
@@ -102,38 +130,49 @@ namespace LucasIndustries.Runtime {
 
 		#region Callback Methods
 		public virtual void OnPointerEnter(PointerEventData eventData) {
-			if (currentSelectionState == SelectionStateType.Selected) { return; }
-			if (currentSelectionState == SelectionStateType.Disabled) { return; }
+			if (currentState == StateType.Disabled) { return; }
 			CurrentHoveredButton = this;
-			SetButtonState(SelectionStateType.Highlighted);
+			if (isSelected) {
+				SetButtonState(StateType.SelectedHighlighted);
+			} else {
+				SetButtonState(StateType.Highlighted);
+			}
 			PointerEnterEvent?.Invoke();
 		}
 
 		public virtual void OnPointerExit(PointerEventData eventData) {
-			if (currentSelectionState == SelectionStateType.Selected) { return; }
-			if (currentSelectionState == SelectionStateType.Disabled) { return; }
+			if (currentState == StateType.Disabled) { return; }
 			CurrentHoveredButton = null;
-			SetButtonState(SelectionStateType.Idle);
+			if (isSelected) {
+				SetButtonState(StateType.Selected);
+			} else {
+				SetButtonState(StateType.Idle);
+			}
 			PointerExitEvent?.Invoke();
 		}
 
 		public virtual void OnPointerDown(PointerEventData eventData) {
-			if (currentSelectionState == SelectionStateType.Selected) { return; }
-			if (currentSelectionState == SelectionStateType.Disabled) { return; }
-			SetButtonState(SelectionStateType.Pressed);
+			if (currentState == StateType.Disabled) { return; }
+			if (isSelected) {
+				SetButtonState(StateType.SelectedPressed);
+			} else {
+				SetButtonState(StateType.Pressed);
+			}
 			PointerDownEvent?.Invoke();
 		}
 
 		public virtual void OnPointerUp(PointerEventData eventData) {
-			if (currentSelectionState == SelectionStateType.Selected) { return; }
-			if (currentSelectionState == SelectionStateType.Disabled) { return; }
-			SetButtonState(SelectionStateType.Idle);
+			if (currentState == StateType.Disabled) { return; }
+			if (isSelected) {
+				SetButtonState(StateType.Selected);
+			} else {
+				SetButtonState(StateType.Idle);
+			}
 			PointerUpEvent?.Invoke();
 		}
 
 		public virtual void OnPointerClick(PointerEventData eventData) {
-			if (currentSelectionState == SelectionStateType.Selected) { return; }
-			if (currentSelectionState == SelectionStateType.Disabled) { return; }
+			if (currentState == StateType.Disabled) { return; }
 			PointerClickEvent?.Invoke();
 		}
 		#endregion
@@ -143,104 +182,148 @@ namespace LucasIndustries.Runtime {
 		#endregion
 
 		#region Public Methods
-		public void SetButtonState(SelectionStateType selectionState, bool ignoreDisabled = true) {
-			if (!ignoreDisabled && currentSelectionState == SelectionStateType.Disabled) { return; }
+		public void SetButtonState(StateType selectionState, bool ignoreDisabled = true) {
+			if (!ignoreDisabled && currentState == StateType.Disabled) { return; }
 			switch (selectionState) {
-				case SelectionStateType.Idle:
-					currentSelectionState = SelectionStateType.Idle;
-					for (int i = 0; i < elements.Length; i++) {
-						if (!elements[i].TargetGraphic) { return; }
-						switch (elements[i].Transition) {
-							case TransitionType.Color:
-								if (CurrentHoveredButton == this) {
-									currentSelectionState = SelectionStateType.Highlighted;
-									elements[i].TargetGraphic.DOColor(elements[i].ColorTransitions.highlightedColor, elements[i].ColorTransitions.fadeDuration);
-								} else {
-									elements[i].TargetGraphic.DOColor(elements[i].ColorTransitions.normalColor, elements[i].ColorTransitions.fadeDuration);
-								}
-								break;
-							case TransitionType.Sprite:
-								if (elements[i].GraphicType != TargetGraphicType.Image) { return; }
-								if (CurrentHoveredButton == this) {
-									if (!elements[i].SpriteTransitions.highlightedSprite) { return; }
-									currentSelectionState = SelectionStateType.Highlighted;
-									((Image)elements[i].TargetGraphic).sprite = elements[i].SpriteTransitions.highlightedSprite;
-								} else {
-									if (!elements[i].CachedNormalSprite) { return; }
-									((Image)elements[i].TargetGraphic).sprite = elements[i].CachedNormalSprite;
-								}
-								break;
-							case TransitionType.None:
-
-								break;
-						}
-					}
-					break;
-				case SelectionStateType.Highlighted:
-					currentSelectionState = SelectionStateType.Highlighted;
-					for (int i = 0; i < elements.Length; i++) {
-						if (!elements[i].TargetGraphic) { return; }
-						switch (elements[i].Transition) {
-							case TransitionType.Color:
-								elements[i].TargetGraphic.DOColor(elements[i].ColorTransitions.highlightedColor, elements[i].ColorTransitions.fadeDuration);
-								break;
-							case TransitionType.Sprite:
-								if (elements[i].GraphicType != TargetGraphicType.Image) { return; }
-								if (!elements[i].SpriteTransitions.highlightedSprite) { return; }
-								((Image)elements[i].TargetGraphic).sprite = elements[i].SpriteTransitions.highlightedSprite;
-								break;
-						}
-					}
-					break;
-				case SelectionStateType.Pressed:
-					currentSelectionState = SelectionStateType.Pressed;
-					for (int i = 0; i < elements.Length; i++) {
-						if (!elements[i].TargetGraphic) { return; }
-						switch (elements[i].Transition) {
-							case TransitionType.Color:
-								elements[i].TargetGraphic.DOColor(elements[i].ColorTransitions.pressedColor, elements[i].ColorTransitions.fadeDuration);
-								break;
-							case TransitionType.Sprite:
-								if (elements[i].GraphicType != TargetGraphicType.Image) { return; }
-								if (!elements[i].SpriteTransitions.pressedSprite) { return; }
-								((Image)elements[i].TargetGraphic).sprite = elements[i].SpriteTransitions.pressedSprite;
-								break;
-						}
-					}
-					break;
-				case SelectionStateType.Selected:
+				case StateType.Idle:
 					if (isSelectable) {
-						currentSelectionState = SelectionStateType.Selected;
+						isSelected = false;
+					}
+					currentState = StateType.Idle;
+					for (int i = 0; i < elements.Length; i++) {
+						if (!elements[i].TargetGraphic) { return; }
+						switch (elements[i].Transition) {
+							case TransitionType.Color:
+								if (CurrentHoveredButton == this) {
+									currentState = StateType.Highlighted;
+									elements[i].TargetGraphic.DOColor(elements[i].ColorTransitions.HighlightedColor, elements[i].ColorTransitions.FadeDuration);
+								} else {
+									elements[i].TargetGraphic.DOColor(elements[i].ColorTransitions.NormalColor, elements[i].ColorTransitions.FadeDuration);
+								}
+								break;
+							case TransitionType.Sprite:
+								if (elements[i].GraphicType != TargetGraphicType.Image) { return; }
+								if (CurrentHoveredButton == this) {
+									if (!elements[i].SpriteTransitions.HighlightedSprite) { return; }
+									currentState = StateType.Highlighted;
+									((Image)elements[i].TargetGraphic).sprite = elements[i].SpriteTransitions.HighlightedSprite;
+								} else {
+									if (!elements[i].SpriteTransitions.NormalSprite) { return; }
+									((Image)elements[i].TargetGraphic).sprite = elements[i].SpriteTransitions.NormalSprite;
+								}
+								break;
+						}
+					}
+					break;
+				case StateType.Highlighted:
+					currentState = StateType.Highlighted;
+					for (int i = 0; i < elements.Length; i++) {
+						if (!elements[i].TargetGraphic) { return; }
+						switch (elements[i].Transition) {
+							case TransitionType.Color:
+								elements[i].TargetGraphic.DOColor(elements[i].ColorTransitions.HighlightedColor, elements[i].ColorTransitions.FadeDuration);
+								break;
+							case TransitionType.Sprite:
+								if (elements[i].GraphicType != TargetGraphicType.Image) { return; }
+								if (!elements[i].SpriteTransitions.HighlightedSprite) { return; }
+								((Image)elements[i].TargetGraphic).sprite = elements[i].SpriteTransitions.HighlightedSprite;
+								break;
+						}
+					}
+					break;
+				case StateType.Pressed:
+					currentState = StateType.Pressed;
+					for (int i = 0; i < elements.Length; i++) {
+						if (!elements[i].TargetGraphic) { return; }
+						switch (elements[i].Transition) {
+							case TransitionType.Color:
+								elements[i].TargetGraphic.DOColor(elements[i].ColorTransitions.PressedColor, elements[i].ColorTransitions.FadeDuration);
+								break;
+							case TransitionType.Sprite:
+								if (elements[i].GraphicType != TargetGraphicType.Image) { return; }
+								if (!elements[i].SpriteTransitions.PressedSprite) { return; }
+								((Image)elements[i].TargetGraphic).sprite = elements[i].SpriteTransitions.PressedSprite;
+								break;
+						}
+					}
+					break;
+				case StateType.Selected:
+					if (isSelectable) {
+						isSelected = true;
+						currentState = StateType.Selected;
 						for (int i = 0; i < elements.Length; i++) {
 							if (!elements[i].TargetGraphic) { return; }
 							switch (elements[i].Transition) {
 								case TransitionType.Color:
-									elements[i].TargetGraphic.DOColor(elements[i].ColorTransitions.selectedColor, elements[i].ColorTransitions.fadeDuration);
+									if (CurrentHoveredButton == this) {
+										currentState = StateType.SelectedHighlighted;
+										elements[i].TargetGraphic.DOColor(elements[i].ColorTransitions.SelectedHighlightedColor, elements[i].ColorTransitions.FadeDuration);
+									} else {
+										elements[i].TargetGraphic.DOColor(elements[i].ColorTransitions.SelectedColor, elements[i].ColorTransitions.FadeDuration);
+									}
 									break;
 								case TransitionType.Sprite:
 									if (elements[i].GraphicType != TargetGraphicType.Image) { return; }
-									if (!elements[i].SpriteTransitions.selectedSprite) { return; }
-									((Image)elements[i].TargetGraphic).sprite = elements[i].SpriteTransitions.selectedSprite;
+									if (CurrentHoveredButton == this) {
+										if (!elements[i].SpriteTransitions.SelectedHighlightedSprite) { return; }
+										currentState = StateType.SelectedHighlighted;
+										((Image)elements[i].TargetGraphic).sprite = elements[i].SpriteTransitions.SelectedHighlightedSprite;
+									} else {
+										if (!elements[i].SpriteTransitions.SelectedSprite) { return; }
+										((Image)elements[i].TargetGraphic).sprite = elements[i].SpriteTransitions.SelectedSprite;
+									}
 									break;
 							}
 						}
 					}
 					break;
-				case SelectionStateType.Disabled:
-					currentSelectionState = SelectionStateType.Disabled;
+				case StateType.SelectedHighlighted:
+					currentState = StateType.SelectedHighlighted;
 					for (int i = 0; i < elements.Length; i++) {
 						if (!elements[i].TargetGraphic) { return; }
 						switch (elements[i].Transition) {
 							case TransitionType.Color:
-								elements[i].TargetGraphic.DOColor(elements[i].ColorTransitions.disabledColor, elements[i].ColorTransitions.fadeDuration);
+								elements[i].TargetGraphic.DOColor(elements[i].ColorTransitions.SelectedHighlightedColor, elements[i].ColorTransitions.FadeDuration);
 								break;
 							case TransitionType.Sprite:
 								if (elements[i].GraphicType != TargetGraphicType.Image) { return; }
-								if (!elements[i].SpriteTransitions.pressedSprite) { return; }
-								((Image)elements[i].TargetGraphic).sprite = elements[i].SpriteTransitions.disabledSprite;
+								if (!elements[i].SpriteTransitions.SelectedHighlightedSprite) { return; }
+								((Image)elements[i].TargetGraphic).sprite = elements[i].SpriteTransitions.SelectedHighlightedSprite;
 								break;
-							case TransitionType.None:
-
+						}
+					}
+					break;
+				case StateType.SelectedPressed:
+					currentState = StateType.SelectedPressed;
+					for (int i = 0; i < elements.Length; i++) {
+						if (!elements[i].TargetGraphic) { return; }
+						switch (elements[i].Transition) {
+							case TransitionType.Color:
+								elements[i].TargetGraphic.DOColor(elements[i].ColorTransitions.SelectedPressedColor, elements[i].ColorTransitions.FadeDuration);
+								break;
+							case TransitionType.Sprite:
+								if (elements[i].GraphicType != TargetGraphicType.Image) { return; }
+								if (!elements[i].SpriteTransitions.SelectedPressedSprite) { return; }
+								((Image)elements[i].TargetGraphic).sprite = elements[i].SpriteTransitions.SelectedPressedSprite;
+								break;
+						}
+					}
+					break;
+				case StateType.Disabled:
+					if (isSelectable) {
+						isSelected = false;
+					}
+					currentState = StateType.Disabled;
+					for (int i = 0; i < elements.Length; i++) {
+						if (!elements[i].TargetGraphic) { return; }
+						switch (elements[i].Transition) {
+							case TransitionType.Color:
+								elements[i].TargetGraphic.DOColor(elements[i].ColorTransitions.DisabledColor, elements[i].ColorTransitions.FadeDuration);
+								break;
+							case TransitionType.Sprite:
+								if (elements[i].GraphicType != TargetGraphicType.Image) { return; }
+								if (!elements[i].SpriteTransitions.PressedSprite) { return; }
+								((Image)elements[i].TargetGraphic).sprite = elements[i].SpriteTransitions.DisabledSprite;
 								break;
 						}
 					}
@@ -251,17 +334,14 @@ namespace LucasIndustries.Runtime {
 
 		#region Private Methods
 		private void InitializeElements() {
-			for (int i = 0; i < elements.Length; i++) {
-				if (!elements[i].TargetGraphic) { return; }
-				if (elements[i].Transition == TransitionType.Sprite) {
-					if (elements[i].GraphicType != TargetGraphicType.Image) { return; }
-					elements[i].CachedNormalSprite = ((Image)elements[i].TargetGraphic).sprite;
-				}
-			}
 			if (startDisabled) {
-				SetButtonState(SelectionStateType.Disabled);
+				SetButtonState(StateType.Disabled);
 			} else {
-				SetButtonState(SelectionStateType.Idle);
+				if (startSelected) {
+					SetButtonState(StateType.Selected);
+				} else {
+					SetButtonState(StateType.Idle);
+				}
 			}
 		}
 
